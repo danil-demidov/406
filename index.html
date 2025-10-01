@@ -3,64 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой сайт-визитка</title>
+    <title>Проект 406</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .tabs { display: flex; gap: 1rem; margin-top: 80px; }
+        .tab-btn { padding: 10px 20px; cursor: pointer; border: none; background: var(--card-bg); color: var(--text-color); font-weight: bold; border-radius: 5px 5px 0 0; }
+        .tab-btn.active { background: var(--primary-color); color: #fff; }
+        .tab-content { display: none; padding: 2rem 1rem; background: var(--card-bg); border-radius: 0 0 5px 5px; }
+        .tab-content.active { display: block; }
+        #readme { white-space: pre-line; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background: var(--primary-color); color: #fff; }
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-top: 0; /* убираем большой верхний отступ */
+            padding: 12px 0; /* небольшой внутренний отступ */
+            background: var(--primary-color);
+            min-height: unset;
+        }
+        .tabs-list {
+            display: flex;
+            gap: 1rem;
+            margin: 0 auto;
+            padding: 0;
+            list-style: none;
+        }
+        #theme-btn {
+            position: absolute;
+            right: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 10px 20px;
+            border-radius: 5px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #theme-btn:hover {
+            background: var(--primary-color);
+            color: #fff;
+        }
+        #readme-intro {
+            margin-bottom: 0.5rem; /* уменьшенный отступ */
+        }
+    </style>
 </head>
 <body>
     <header>
-        <nav>
-            <ul>
-                <li><a href="#about">Обо мне</a></li>
-                <li><a href="#skills">Навыки</a></li>
-                <li><a href="#contact">Контакты</a></li>
+        <nav class="nav-tabs">
+            <ul class="tabs-list">
+                <li><button class="tab-btn active" data-tab="about">О проекте</button></li>
+                <li><button class="tab-btn" data-tab="authors">Авторы</button></li>
             </ul>
+            <button id="theme-btn" onclick="toggleTheme()">Сменить тему</button>
         </nav>
     </header>
 
     <main>
         <section id="hero">
             <div class="container">
-                <img src="https://via.placeholder.com/150" alt="Мое фото" class="profile-photo">
-                <h1>Иван Иванов</h1>
-                <p>Веб-разработчик</p>
-                <button onclick="toggleTheme()">Сменить тему</button>
+                <h1>Проект 406</h1>
+                <div id="readme-intro"></div>
             </div>
         </section>
 
-        <section id="about">
-            <div class="container">
-                <h2>Обо мне</h2>
-                <p>Привет! Я веб-разработчик с опытом создания современных веб-приложений.</p>
+        <div class="container">
+            <div id="about" class="tab-content active">
+                <h2>О проекте</h2>
+                <div id="readme-about"></div>
             </div>
-        </section>
-
-        <section id="skills">
-            <div class="container">
-                <h2>Навыки</h2>
-                <ul>
-                    <li>HTML/CSS</li>
-                    <li>JavaScript</li>
-                    <li>React</li>
-                    <li>Node.js</li>
-                </ul>
+            <div id="authors" class="tab-content">
+                <h2>Авторы</h2>
+                <div id="readme-authors"></div>
             </div>
-        </section>
-
-        <section id="contact">
-            <div class="container">
-                <h2>Контакты</h2>
-                <p>Email: example@email.com</p>
-                <p>Телефон: +7 (999) 999-99-99</p>
-            </div>
-        </section>
+        </div>
     </main>
 
     <footer>
         <div class="container">
-            <p>&copy; 2024 Мой сайт-визитка</p>
+            <div id="readme-footer"></div>
+            <p>&copy; 2025 Проект 406</p>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+    // Табы
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Смена темы
+    function toggleTheme() {
+        const theme = document.documentElement.getAttribute('data-theme');
+        document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'light' : 'dark');
+    }
+
+    // Загрузка README.md и вывод по табам
+    fetch('README.md')
+        .then(response => response.text())
+        .then(text => {
+            // Вводная часть до "## Об этом проекте"
+            const introMatch = text.match(/([\s\S]*?)## Об этом проекте/);
+            if (introMatch) {
+                let introText = introMatch[1]
+                    .split('\n')
+                    .filter(line => line.trim() !== '---')
+                    .join('\n');
+                let introHtml = introText
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\n/g, '<br>');
+                // Удаляем лишние <br> в конце
+                introHtml = introHtml.replace(/(<br>\s*)+$/,'')
+                document.getElementById('readme-intro').innerHTML = introHtml;
+            }
+
+            // "Об этом проекте" как список
+            const aboutMatch = text.match(/## Об этом проекте([\s\S]*?)## Авторы/);
+            if (aboutMatch) {
+                const aboutSection = aboutMatch[1].trim();
+                // Ищем строку "Изучаем" и список
+                const listMatch = aboutSection.match(/(Изучаем)\s*([\s\S]*)/);
+                if (listMatch) {
+                    const intro = listMatch[1]; // "Изучаем"
+                    const items = listMatch[2]
+                        .split('\n')
+                        .map(line => line.trim())
+                        .filter(line => line.startsWith('-'))
+                        .map(line => line.replace(/^- /, ''));
+                    let html = `<div>${intro}</div><ul>`;
+                    items.forEach(item => html += `<li>${item}</li>`);
+                    html += '</ul>';
+                    document.getElementById('readme-about').innerHTML = html;
+                } else {
+                    document.getElementById('readme-about').textContent = aboutSection;
+                }
+            }
+
+            // "Авторы" как таблица и текст после таблицы
+            const authorsMatch = text.match(/## Авторы([\s\S]*)/);
+            if (authorsMatch) {
+                const authorsSection = authorsMatch[1].trim();
+                // Ищем таблицу: от первой строки с | Имя до первой пустой строки после таблицы
+                const tableStart = authorsSection.indexOf('| Имя');
+                let tableEnd = -1;
+                if (tableStart !== -1) {
+                    // Найти первую пустую строку после таблицы
+                    const afterTable = authorsSection.slice(tableStart).split('\n');
+                    let tableLines = [];
+                    for (let i = 0; i < afterTable.length; i++) {
+                        if (afterTable[i].trim() === '' && i > 2) { // пустая строка после таблицы
+                            tableEnd = tableStart + afterTable.slice(0, i).join('\n').length;
+                            break;
+                        }
+                        tableLines.push(afterTable[i]);
+                    }
+                    // Парсим таблицу
+                    if (tableLines.length >= 3) {
+                        let html = '<table><thead><tr>';
+                        tableLines[0].split('|').forEach((cell, i) => {
+                            if (i !== 0 && cell.trim()) html += `<th>${cell.trim()}</th>`;
+                        });
+                        html += '</tr></thead><tbody>';
+                        for (let i = 2; i < tableLines.length; i++) {
+                            const cols = tableLines[i].split('|').map(c => c.trim()).filter(Boolean);
+                            if (cols.length) {
+                                html += '<tr>';
+                                cols.forEach(cell => html += `<td>${cell}</td>`);
+                                html += '</tr>';
+                            }
+                        }
+                        html += '</tbody></table>';
+                        document.getElementById('readme-authors').innerHTML = html;
+                    } else {
+                        document.getElementById('readme-authors').textContent = tableLines.join('\n');
+                    }
+                    // Текст после таблицы
+                    let afterText = authorsSection.slice(tableStart + tableLines.join('\n').length).trim();
+                    if (afterText) {
+                        document.getElementById('readme-footer').innerHTML = afterText.replace(/\n/g, '<br>');
+                    }
+                } else {
+                    document.getElementById('readme-authors').textContent = authorsSection;
+                }
+            }
+        });
+    </script>
 </body>
 </html>
