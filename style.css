@@ -1,12 +1,12 @@
 :root {
-    --primary-color: #007bff;
+    --primary-color: #d32f2f; /* красный */
     --bg-color: #ffffff;
     --text-color: #333333;
     --card-bg: #f8f9fa;
 }
 
 [data-theme="dark"] {
-    --primary-color: #6c757d;
+    --primary-color: #b71c1c; /* темно-красный */
     --bg-color: #121212;
     --text-color: #ffffff;
     --card-bg: #1e1e1e;
