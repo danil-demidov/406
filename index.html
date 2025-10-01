@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой сайт-визитка</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#about">Обо мне</a></li>
+                <li><a href="#skills">Навыки</a></li>
+                <li><a href="#contact">Контакты</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="container">
+                <img src="https://via.placeholder.com/150" alt="Мое фото" class="profile-photo">
+                <h1>Иван Иванов</h1>
+                <p>Веб-разработчик</p>
+                <button onclick="toggleTheme()">Сменить тему</button>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <h2>Обо мне</h2>
+                <p>Привет! Я веб-разработчик с опытом создания современных веб-приложений.</p>
+            </div>
+        </section>
+
+        <section id="skills">
+            <div class="container">
+                <h2>Навыки</h2>
+                <ul>
+                    <li>HTML/CSS</li>
+                    <li>JavaScript</li>
+                    <li>React</li>
+                    <li>Node.js</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="contact">
+            <div class="container">
+                <h2>Контакты</h2>
+                <p>Email: example@email.com</p>
+                <p>Телефон: +7 (999) 999-99-99</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Мой сайт-визитка</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
