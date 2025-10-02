@@ -20,10 +20,26 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            margin-top: 0; /* убираем большой верхний отступ */
-            padding: 12px 0; /* небольшой внутренний отступ */
             background: var(--primary-color);
-            min-height: unset;
+            padding: 12px 0;
+        }
+        #blog-btn {
+            position: absolute;
+            left: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 10px 20px;
+            border-radius: 5px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: none;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        #blog-btn:hover {
+            background: var(--primary-color);
+            color: #fff;
         }
         .tabs-list {
             display: flex;
@@ -50,13 +66,14 @@
             color: #fff;
         }
         #readme-intro {
-            margin-bottom: 0.5rem; /* уменьшенный отступ */
+            margin-bottom: 0.5rem;
         }
     </style>
 </head>
 <body>
     <header>
         <nav class="nav-tabs">
+            <a href="blog.html" id="blog-btn">Блог</a>
             <ul class="tabs-list">
                 <li><button class="tab-btn active" data-tab="about">О проекте</button></li>
                 <li><button class="tab-btn" data-tab="authors">Авторы</button></li>
@@ -72,7 +89,6 @@
                 <div id="readme-intro"></div>
             </div>
         </section>
-
         <div class="container">
             <div id="about" class="tab-content active">
                 <h2>О проекте</h2>
@@ -84,7 +100,6 @@
             </div>
         </div>
     </main>
-
     <footer>
         <div class="container">
             <div id="readme-footer"></div>
@@ -106,10 +121,20 @@
     // Смена темы
     function toggleTheme() {
         const theme = document.documentElement.getAttribute('data-theme');
-        document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'light' : 'dark');
+        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme); // сохраняем тему
     }
 
-    // Загрузка README.md и вывод по табам
+    // При загрузке страницы — применяем сохранённую тему
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+    });
+
+    // Загрузка README.md и вывод по блокам
     fetch('README.md')
         .then(response => response.text())
         .then(text => {
@@ -123,7 +148,6 @@
                 let introHtml = introText
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\n/g, '<br>');
-                // Удаляем лишние <br> в конце
                 introHtml = introHtml.replace(/(<br>\s*)+$/,'')
                 document.getElementById('readme-intro').innerHTML = introHtml;
             }
@@ -132,7 +156,6 @@
             const aboutMatch = text.match(/## Об этом проекте([\s\S]*?)## Авторы/);
             if (aboutMatch) {
                 const aboutSection = aboutMatch[1].trim();
-                // Ищем строку "Изучаем" и список
                 const listMatch = aboutSection.match(/(Изучаем)\s*([\s\S]*)/);
                 if (listMatch) {
                     const intro = listMatch[1]; // "Изучаем"
@@ -154,21 +177,18 @@
             const authorsMatch = text.match(/## Авторы([\s\S]*)/);
             if (authorsMatch) {
                 const authorsSection = authorsMatch[1].trim();
-                // Ищем таблицу: от первой строки с | Имя до первой пустой строки после таблицы
                 const tableStart = authorsSection.indexOf('| Имя');
                 let tableEnd = -1;
                 if (tableStart !== -1) {
-                    // Найти первую пустую строку после таблицы
                     const afterTable = authorsSection.slice(tableStart).split('\n');
                     let tableLines = [];
                     for (let i = 0; i < afterTable.length; i++) {
-                        if (afterTable[i].trim() === '' && i > 2) { // пустая строка после таблицы
+                        if (afterTable[i].trim() === '' && i > 2) {
                             tableEnd = tableStart + afterTable.slice(0, i).join('\n').length;
                             break;
                         }
                         tableLines.push(afterTable[i]);
                     }
-                    // Парсим таблицу
                     if (tableLines.length >= 3) {
                         let html = '<table><thead><tr>';
                         tableLines[0].split('|').forEach((cell, i) => {
