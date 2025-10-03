@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= theme %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проект 406</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: var(--primary-color);
+            padding: 12px 0;
+        }
+        #blog-btn {
+            position: absolute;
+            left: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 10px 20px;
+            border-radius: 5px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: none;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        #blog-btn:hover {
+            background: var(--primary-color);
+            color: #fff;
+        }
+        .tabs-list {
+            display: flex;
+            gap: 1rem;
+            margin: 0 auto;
+            padding: 0;
+            list-style: none;
+        }
+        #theme-btn {
+            position: absolute;
+            right: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 10px 20px;
+            border-radius: 5px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #theme-btn:hover {
+            background: var(--primary-color);
+            color: #fff;
+        }
+        #readme-intro {
+            margin-bottom: 0.5rem;
+        }
+        .tab-content { display: none; padding: 2rem 1rem; background: var(--card-bg); border-radius: 0 0 5px 5px; }
+        .tab-content.active { display: block; }
+        .container { max-width: 900px; margin: 0 auto; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background: var(--primary-color); color: #fff; }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Смена темы
+            const themeBtn = document.getElementById('theme-btn');
+            if (themeBtn) {
+                themeBtn.onclick = () => {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    fetch('/theme', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'theme=' + newTheme
+                    });
+                };
+            }
+            // Табы
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab).classList.add('active');
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <nav class="nav-tabs">
+            <a href="/blog" id="blog-btn">Блог</a>
+            <ul class="tabs-list">
+                <li><button class="tab-btn active" data-tab="about">О проекте</button></li>
+                <li><button class="tab-btn" data-tab="authors">Авторы</button></li>
+            </ul>
+            <button id="theme-btn">Сменить тему</button>
+        </nav>
+    </header>
+    <main>
+        <section id="hero">
+            <div class="container">
+                <h1>Проект 406</h1>
+                <div id="readme-intro">
+                    Этот проект был создан в рамках курса <strong>«Коллективная разработка ПО»</strong> студентами Университета <strong>Синергия</strong>.<br>
+                    Мы объединили усилия, навыки и капельку безумия, чтобы создать нечто большее, чем просто лабораторную работу.
+                </div>
+            </div>
+        </section>
+        <div class="container">
+            <div id="about" class="tab-content active">
+                <h2>О проекте</h2>
+                <div id="readme-about">
+                    <div>Изучаем</div>
+                    <ul>
+                        <li>Git и командную работу</li>
+                        <li>Процессы CI/CD</li>
+                        <li>Ветвление, pull request’ы и code review</li>
+                        <li>Как не сломать продакшн за 5 минут</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="authors" class="tab-content">
+                <h2>Авторы</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Имя</th>
+                            <th>Роль в команде</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Демидов Д.А.</td><td>DevOps, тестирование</td></tr>
+                        <tr><td>Батин Н.А.</td><td>Архитектор, разработка</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="container">
+            <div style="margin-bottom: 1rem;">
+                Мы не просто пишем код. Мы учимся работать вместе, принимать решения, разруливать конфликты и доводить дело до конца.
+            </div>
+            <p>&copy; 2025 Проект 406</p>
+        </div>
+    </footer>
+</body>
+</html>
