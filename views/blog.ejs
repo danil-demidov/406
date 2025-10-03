@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= theme %>">
+<head>
+    <meta charset="UTF-8">
+    <title>Блог</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body { margin: 0; }
+        main.container { padding-left: 32px; padding-right: 32px; margin-top: 142px; }
+        .blog-flex { display: flex; align-items: flex-start; gap: 2rem; }
+        #create-post-btn {
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            min-width: 140px;
+            margin-left: 0;
+            margin-top: 0;
+        }
+        #post-form { margin-top: 1rem; width: 100%; }
+        .post { background: var(--card-bg); padding: 1rem; margin-bottom: 1rem; border-radius: 5px; }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeBtn = document.getElementById('theme-btn');
+            if (themeBtn) {
+                themeBtn.onclick = () => {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    fetch('/theme', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'theme=' + newTheme
+                    });
+                };
+            }
+            const createBtn = document.getElementById('create-post-btn');
+            const postForm = document.getElementById('post-form');
+            const cancelBtn = document.getElementById('cancel-btn');
+            if (createBtn && postForm && cancelBtn) {
+                createBtn.onclick = () => {
+                    postForm.style.display = 'block';
+                    createBtn.style.display = 'none';
+                };
+                cancelBtn.onclick = () => {
+                    postForm.style.display = 'none';
+                    createBtn.style.display = 'inline-block';
+                };
+            }
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <nav style="display: flex; align-items: center; justify-content: center; background: var(--primary-color); padding: 12px 0; position: relative;">
+            <a href="/" style="position: absolute; left: 32px; top: 50%; transform: translateY(-50%);
+                padding: 10px 20px; border-radius: 5px; background: var(--card-bg);
+                color: var(--text-color); text-decoration: none; font-weight: bold;">
+                ← Назад
+            </a>
+            <h2 style="margin: 0; color: #fff; font-size: 2rem; width: 100%; text-align: center;">Блог</h2>
+            <button id="theme-btn" style="position: absolute; right: 32px; top: 50%; transform: translateY(-50%);
+                padding: 10px 20px; border-radius: 5px; background: var(--card-bg); color: var(--text-color);
+                border: none; font-weight: bold; cursor: pointer;">Сменить тему</button>
+        </nav>
+    </header>
+    <main class="container">
+        <div class="blog-flex">
+            <div style="display: flex; flex-direction: column; align-items: flex-start; min-width: 220px;">
+                <button id="create-post-btn">Создать пост</button>
+                <form id="post-form" action="/blog/create" method="POST" style="display:none; margin-top: 1rem; width: 100%;">
+                    <div style="display: flex; flex-direction: column; margin-bottom: 1rem;">
+                        <label for="post-author" style="margin-bottom: 4px;">Имя:</label>
+                        <input type="text" id="post-author" name="author" required>
+                    </div>
+                    <div style="display: flex; flex-direction: column; margin-bottom: 1rem;">
+                        <label for="post-text" style="margin-bottom: 4px;">Текст поста:</label>
+                        <textarea id="post-text" name="text" required></textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit"
+                            style="background: var(--primary-color); color: #fff; border: none; border-radius: 5px; padding: 10px 20px; font-weight: bold; cursor: pointer;">
+                            Сохранить
+                        </button>
+                        <button type="button" id="cancel-btn"
+                            style="background: var(--card-bg); color: var(--text-color); border: 1px solid #ccc; border-radius: 5px; padding: 10px 20px; font-weight: bold; cursor: pointer;">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div id="posts-list" style="flex: 1;">
+                <% posts.forEach(post => { %>
+                    <div class="post">
+                        <strong>#<%= post.id %> <%= post.author %></strong>
+                        <p><%= post.text %></p>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
