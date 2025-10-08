@@ -10,6 +10,7 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 
 // Модель поста
 const postSchema = new mongoose.Schema({
+    postid: Number,
     author: String,
     text: String
 });
@@ -49,7 +50,10 @@ app.get('/api/posts', async (req, res) => {
 app.post('/api/posts', express.json(), async (req, res) => {
     const { author, text } = req.body;
     if (author && text) {
-        const post = new Post({ author, text });
+        // Получаем максимальный postid
+        const lastPost = await Post.findOne().sort({ postid: -1 });
+        const postid = lastPost ? lastPost.postid + 1 : 1;
+        const post = new Post({ postid, author, text });
         await post.save();
         res.status(200).json({ message: 'Пост успешно создан' });
     } else {
