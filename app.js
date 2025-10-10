@@ -16,6 +16,15 @@ const postSchema = new mongoose.Schema({
 });
 const Post = mongoose.model('Post', postSchema);
 
+// Модель комментария
+const commentSchema = new mongoose.Schema({
+    commentid: Number,
+    postid: Number,
+    author: String,
+    text: String
+});
+const Comment = mongoose.model('Comment', commentSchema);
+
 // Инициализация пустого массива постов
 let posts = [];
 
@@ -68,6 +77,28 @@ app.get('/post/:postid', async (req, res) => {
     const post = await Post.findOne({ postid });
     if (!post) return res.status(404).send('Пост не найден');
     res.render('post', { theme, post });
+});
+
+// API: получить комментарии к посту (от новых к старым)
+app.get('/api/comments/:postid', async (req, res) => {
+    const postid = Number(req.params.postid);
+    const comments = await Comment.find({ postid }).sort({ commentid: -1 });
+    res.json(comments);
+});
+
+// API: создать комментарий к посту
+app.post('/api/comments/:postid', express.json(), async (req, res) => {
+    const postid = Number(req.params.postid);
+    const { author, text } = req.body;
+    if (author && text) {
+        const lastComment = await Comment.findOne({ postid }).sort({ commentid: -1 });
+        const commentid = lastComment ? lastComment.commentid + 1 : 1;
+        const comment = new Comment({ commentid, postid, author, text });
+        await comment.save();
+        res.status(200).json({ message: 'Комментарий успешно добавлен' });
+    } else {
+        res.status(400).json({ message: 'author и text обязательны' });
+    }
 });
 
 // app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

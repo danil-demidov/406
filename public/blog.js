@@ -80,19 +80,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Работа с API
     const postsList = document.getElementById('posts-list');
+    function getCommentWord(n) {
+        n = Math.abs(n) % 100;
+        const n1 = n % 10;
+        if (n > 10 && n < 20) return 'комментариев';
+        if (n1 === 1) return 'комментарий';
+        if (n1 >= 2 && n1 <= 4) return 'комментария';
+        return 'комментариев';
+    }
+
     function renderPosts(posts) {
-        // Сортировка по убыванию postid (новые выше)
         posts.sort((a, b) => b.postid - a.postid);
         postsList.innerHTML = '';
-        posts.forEach(post => {
-            const div = document.createElement('div');
-            div.className = 'post';
-            div.innerHTML = `<strong>#${post.postid} ${post.author}</strong><p>${post.text}</p>`;
-            div.style.cursor = 'pointer';
-            div.onclick = () => {
-                window.location.href = `/post/${post.postid}`;
-            };
-            postsList.appendChild(div);
+
+        Promise.all(posts.map(post =>
+            fetch(`/api/comments/${post.postid}`)
+                .then(res => res.json())
+                .then(comments => ({ post, commentsCount: comments.length }))
+        )).then(results => {
+            results.forEach(({ post, commentsCount }) => {
+                const div = document.createElement('div');
+                div.className = 'post';
+                div.style.cursor = 'pointer';
+                div.onclick = () => {
+                    window.location.href = `/post/${post.postid}`;
+                };
+                div.innerHTML = `
+                    <strong>#${post.postid} ${post.author}</strong>
+                    <p>${post.text}</p>
+                    ${
+                        commentsCount > 0
+                            ? `<div style="margin-top:8px;color:var(--text-color-secondary);font-size:0.95em;font-style:italic;">
+                                ${commentsCount} ${getCommentWord(commentsCount)}
+                            </div>`
+                            : ''
+                    }
+                `;
+                postsList.appendChild(div);
+            });
         });
     }
     function loadPosts() {

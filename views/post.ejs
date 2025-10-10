@@ -29,8 +29,22 @@
             <strong>#<%= post.postid %> <%= post.author %></strong>
             <p><%= post.text %></p>
         </div>
+        <div style="display: flex; align-items: flex-start; gap: 2rem;">
+            <button id="add-comment-btn"
+                style="background: var(--primary-color); color: #fff; border: none; border-radius: 5px; padding: 10px 20px; font-weight: bold; cursor: pointer;">
+                Добавить комментарий
+            </button>
+            <div id="comments-list" style="flex: 1; margin-left: auto;"></div>
+        </div>
     </main>
+    <!-- Модальное окно для формы комментария -->
+    <div id="modal-bg" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); z-index:1000;">
+        <div id="modal-window" style="background:var(--card-bg); padding:2rem; border-radius:10px; max-width:400px; margin:10vh auto 0 auto; position:relative;">
+            <!-- Форма будет вставлена через JS -->
+        </div>
+    </div>
     <script>
+        // Смена темы
         document.getElementById('theme-btn').onclick = function() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -40,6 +54,84 @@
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'theme=' + newTheme
             });
+        };
+
+        // Работа с комментариями
+        const postid = <%= post.postid %>;
+        const addCommentBtn = document.getElementById('add-comment-btn');
+        const modalBg = document.getElementById('modal-bg');
+        const modalWindow = document.getElementById('modal-window');
+        const commentsList = document.getElementById('comments-list');
+
+        function renderComments(comments) {
+            commentsList.innerHTML = '';
+            comments.forEach(comment => {
+                const div = document.createElement('div');
+                div.className = 'comment';
+                div.style = 'background:var(--card-bg);margin-bottom:8px;padding:8px;border-radius:5px;';
+                div.innerHTML = `<strong>#${comment.commentid} ${comment.author}</strong><p>${comment.text}</p>`;
+                commentsList.appendChild(div);
+            });
+        }
+
+        function loadComments() {
+            fetch(`/api/comments/${postid}`)
+                .then(res => res.json())
+                .then(renderComments);
+        }
+        loadComments();
+
+        addCommentBtn.onclick = () => {
+            modalBg.style.display = 'block';
+            modalWindow.innerHTML = `
+                <form id="comment-form" style="width:100%;">
+                    <div style="display: flex; flex-direction: column; margin-bottom: 1rem;">
+                        <label for="comment-author" style="margin-bottom: 4px;">Имя:</label>
+                        <input type="text" id="comment-author" name="author" required>
+                    </div>
+                    <div style="display: flex; flex-direction: column; margin-bottom: 1rem;">
+                        <label for="comment-text" style="margin-bottom: 4px;">Текст комментария:</label>
+                        <textarea id="comment-text" name="text" required></textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit"
+                            style="background: var(--primary-color); color: #fff; border: none; border-radius: 5px; padding: 10px 20px; font-weight: bold; cursor: pointer;">
+                            Сохранить
+                        </button>
+                        <button type="button" id="cancel-btn"
+                            style="background: var(--card-bg); color: var(--text-color); border: 1px solid #ccc; border-radius: 5px; padding: 10px 20px; font-weight: bold; cursor: pointer;">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+                <button id="close-modal" style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.5rem;cursor:pointer;">×</button>
+            `;
+
+            document.getElementById('close-modal').onclick = () => {
+                modalBg.style.display = 'none';
+            };
+            document.getElementById('cancel-btn').onclick = () => {
+                modalBg.style.display = 'none';
+            };
+
+            document.getElementById('comment-form').onsubmit = function(e) {
+                e.preventDefault();
+                const author = document.getElementById('comment-author').value;
+                const text = document.getElementById('comment-text').value;
+                fetch(`/api/comments/${postid}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ author, text })
+                }).then(() => {
+                    modalBg.style.display = 'none';
+                    loadComments();
+                });
+            };
+        };
+
+        // Клик вне окна — закрыть модалку
+        modalBg.onclick = function(e) {
+            if (e.target === modalBg) modalBg.style.display = 'none';
         };
     </script>
 </body>
