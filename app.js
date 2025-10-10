@@ -6,7 +6,7 @@ const app = express();
 const PORT = 3000;
 
 // Подключение к MongoDB Atlas
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGODB_URI);
 
 // Модель поста
 const postSchema = new mongoose.Schema({
@@ -59,6 +59,15 @@ app.post('/api/posts', express.json(), async (req, res) => {
     } else {
         res.status(400).json({ message: 'author и text обязательны' });
     }
+});
+
+app.get('/post/:postid', async (req, res) => {
+    const theme = req.cookies.theme || 'light';
+    const postid = Number(req.params.postid);
+    // Если используется MongoDB:
+    const post = await Post.findOne({ postid });
+    if (!post) return res.status(404).send('Пост не найден');
+    res.render('post', { theme, post });
 });
 
 // app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

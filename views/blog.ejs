@@ -41,13 +41,19 @@
     <main class="container">
         <div class="blog-flex">
             <div id="form-container" style="display: flex; flex-direction: column; align-items: flex-start; min-width: 220px;">
-                <!-- Форма будет создана через JS -->
+                <button id="create-post-btn">Создать пост</button>
             </div>
             <div id="posts-list" style="flex: 1;">
                 <!-- Посты будут загружаться через JS -->
             </div>
         </div>
     </main>
+    <!-- Модальное окно для формы -->
+    <div id="modal-bg" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); z-index:1000;">
+        <div id="modal-window" style="background:var(--card-bg); padding:2rem; border-radius:10px; max-width:400px; margin:10vh auto 0 auto; position:relative;">
+            <!-- Форма будет вставлена через JS -->
+        </div>
+    </div>
     <script src="/blog.js"></script>
 </body>
 </html>
