@@ -25,9 +25,13 @@
         </nav>
     </header>
     <main class="container">
-        <div class="post">
-            <strong>#<%= post.postid %> <%= post.author %></strong>
-            <p><%= post.text %></p>
+        <div class="post" style="position:relative;">
+            <strong>#<%= post.postid %> <span id="post-author"><%= post.author %></span></strong>
+            <p id="post-text"><%= post.text %></p>
+            <button id="edit-post-btn" title="Редактировать пост"
+                style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text-color-secondary);">
+                ✎
+            </button>
         </div>
         <div style="display: flex; align-items: flex-start; gap: 2rem;">
             <button id="add-comment-btn"
@@ -61,6 +65,7 @@
         const addCommentBtn = document.getElementById('add-comment-btn');
         const modalBg = document.getElementById('modal-bg');
         const modalWindow = document.getElementById('modal-window');
+        const editBtn = document.getElementById('edit-post-btn');
         const commentsList = document.getElementById('comments-list');
 
         function renderComments(comments) {
@@ -68,8 +73,28 @@
             comments.forEach(comment => {
                 const div = document.createElement('div');
                 div.className = 'comment';
-                div.style = 'background:var(--card-bg);margin-bottom:8px;padding:8px;border-radius:5px;';
+                div.style = 'background:var(--card-bg);margin-bottom:8px;padding:8px;border-radius:5px;position:relative;';
                 div.innerHTML = `<strong>#${comment.commentid} ${comment.author}</strong><p>${comment.text}</p>`;
+
+                // Кнопка "крестик"
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = '×';
+                closeBtn.title = 'Удалить комментарий';
+                closeBtn.style.position = 'absolute';
+                closeBtn.style.top = '10px';
+                closeBtn.style.right = '10px';
+                closeBtn.style.background = 'none';
+                closeBtn.style.border = 'none';
+                closeBtn.style.fontSize = '1.2rem';
+                closeBtn.style.cursor = 'pointer';
+                closeBtn.style.color = 'var(--text-color-secondary)';
+                closeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    fetch(`/api/comments/${comment.postid}/${comment.commentid}/hide`, { method: 'POST' })
+                        .then(() => loadComments());
+                };
+
+                div.appendChild(closeBtn);
                 commentsList.appendChild(div);
             });
         }
@@ -132,6 +157,56 @@
         // Клик вне окна — закрыть модалку
         modalBg.onclick = function(e) {
             if (e.target === modalBg) modalBg.style.display = 'none';
+        };
+
+        // Редактирование поста
+        editBtn.onclick = () => {
+            modalBg.style.display = 'block';
+            modalWindow.innerHTML = `
+                <form id="edit-post-form" style="width:100%;">
+                    <div style="display: flex; flex-direction: column; margin-bottom: 1rem;">
+                        <label for="edit-author" style="margin-bottom: 4px;">Имя:</label>
+                        <input type="text" id="edit-author" name="author" required value="${document.getElementById('post-author').textContent}">
+                    </div>
+                    <div style="display: flex; flex-direction: column; margin-bottom: 1rem;">
+                        <label for="edit-text" style="margin-bottom: 4px;">Текст поста:</label>
+                        <textarea id="edit-text" name="text" required>${document.getElementById('post-text').textContent}</textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit"
+                            style="background: var(--primary-color); color: #fff; border: none; border-radius: 5px; padding: 10px 20px; font-weight: bold; cursor: pointer;">
+                            Сохранить
+                        </button>
+                        <button type="button" id="cancel-edit-btn"
+                            style="background: var(--card-bg); color: var(--text-color); border: 1px solid #ccc; border-radius: 5px; padding: 10px 20px; font-weight: bold; cursor: pointer;">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+                <button id="close-edit-modal" style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.5rem;cursor:pointer;">×</button>
+            `;
+
+            document.getElementById('close-edit-modal').onclick = () => {
+                modalBg.style.display = 'none';
+            };
+            document.getElementById('cancel-edit-btn').onclick = () => {
+                modalBg.style.display = 'none';
+            };
+
+            document.getElementById('edit-post-form').onsubmit = function(e) {
+                e.preventDefault();
+                const author = document.getElementById('edit-author').value;
+                const text = document.getElementById('edit-text').value;
+                fetch(`/api/posts/${postid}/edit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ author, text })
+                }).then(() => {
+                    document.getElementById('post-author').textContent = author;
+                    document.getElementById('post-text').textContent = text;
+                    modalBg.style.display = 'none';
+                });
+            };
         };
     </script>
 </body>
