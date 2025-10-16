@@ -102,6 +102,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const div = document.createElement('div');
                 div.className = 'post';
                 div.style.cursor = 'pointer';
+                div.style.position = 'relative';
+
+                // Кнопка "крестик"
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = '×';
+                closeBtn.title = 'Удалить пост';
+                closeBtn.style.position = 'absolute';
+                closeBtn.style.top = '10px';
+                closeBtn.style.right = '10px';
+                closeBtn.style.background = 'none';
+                closeBtn.style.border = 'none';
+                closeBtn.style.fontSize = '1.5rem';
+                closeBtn.style.cursor = 'pointer';
+                closeBtn.style.color = 'var(--text-color-secondary)';
+                closeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    fetch(`/api/posts/${post.postid}/hide`, { method: 'POST' })
+                        .then(() => loadPosts());
+                };
+
                 div.onclick = () => {
                     window.location.href = `/post/${post.postid}`;
                 };
@@ -116,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             : ''
                     }
                 `;
+                div.appendChild(closeBtn);
                 postsList.appendChild(div);
             });
         });

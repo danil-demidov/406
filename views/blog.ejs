@@ -55,5 +55,59 @@
         </div>
     </div>
     <script src="/blog.js"></script>
+    <script>
+        function renderPosts(posts) {
+    posts.sort((a, b) => b.postid - a.postid);
+    postsList.innerHTML = '';
+
+    Promise.all(posts.map(post =>
+        fetch(`/api/comments/${post.postid}`)
+            .then(res => res.json())
+            .then(comments => ({ post, commentsCount: comments.length }))
+    )).then(results => {
+        results.forEach(({ post, commentsCount }) => {
+            const div = document.createElement('div');
+            div.className = 'post';
+            div.style.cursor = 'pointer';
+            div.style.position = 'relative';
+
+            // Кнопка "крестик" для скрытия поста
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '×';
+            closeBtn.title = 'Скрыть пост';
+            closeBtn.style.position = 'absolute';
+            closeBtn.style.top = '10px';
+            closeBtn.style.right = '10px';
+            closeBtn.style.background = 'none';
+            closeBtn.style.border = 'none';
+            closeBtn.style.fontSize = '1.5rem';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.style.color = 'var(--text-color-secondary)';
+            closeBtn.onclick = (e) => {
+                e.stopPropagation();
+                fetch(`/api/posts/${post.postid}/hide`, { method: 'POST' })
+                    .then(() => loadPosts());
+            };
+
+            div.onclick = () => {
+                window.location.href = `/post/${post.postid}`;
+            };
+            div.innerHTML = `
+                <strong>#${post.postid} ${post.author}</strong>
+                <p>${post.text}</p>
+                ${
+                    commentsCount > 0
+                        ? `<div style="margin-top:8px;color:var(--text-color-secondary);font-size:0.95em;font-style:italic;">
+                            ${commentsCount} ${getCommentWord(commentsCount)}
+                        </div>`
+                        : ''
+                }
+            `;
+            div.appendChild(closeBtn);
+            postsList.appendChild(div);
+        });
+    });
+}
+    </script>
 </body>
 </html>
