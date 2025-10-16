@@ -2,7 +2,7 @@
 
 ## Я <span style="color:green;font-weight:700;font-size:20px"> Данил </span> и я отвечаю за DevOps, тестирование, CI/CD и мемы 
 
-<img src="assets/yes-computer.gif" alt="color_picker" width="400" height="300" />
+<img src="assets/I.gif" alt="color_picker" width="400" height="300" />
 
 ## Занятие 1  
 
@@ -47,6 +47,8 @@ chore: init gitignore and readme
 Жизнь проекта — тикет, код, ревью, done.  
 Никаких чудес, но приятно, когда система работает как часы.
 
+<img width="350" height="400" src="assets/kiss.gif" alt="color picker" />
+
 ---
 
 ## Занятие 4  
@@ -80,7 +82,7 @@ chore: init gitignore and readme
 Посты создаются, всё кликается, граф активности на GitHub живёт своей жизнью.  
 *Insights → Graph* — там даже красивые линии.
 
-<img width="400" height="300" src="assets/heroin.gif" alt="color picker" />
+<img width="400" height="250" src="assets/heroin.gif" alt="color picker" />
 
 На ретроспективе сказал просто:  
 работали спокойно, без драм, каждый делал своё.  
