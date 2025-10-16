@@ -1,6 +1,6 @@
-# Мы решили запилить общий отчёт проекта "Блог"
+# <p style="text-align: center;"> Мы решили запилить общий отчёт проекта "Блог" с разбивкой по исполнителям </p>
 
-## Я Данил и я отвечаю за DevOps, тестирование, CI/CD и мемы
+## Я <span style="color:green;font-weight:700;font-size:20px"> Данил </span> и я отвечаю за DevOps, тестирование, CI/CD и мемы 
 
 <img src="assets/yes-computer.gif" alt="color_picker" width="400" height="300" />
 
@@ -89,7 +89,7 @@ chore: init gitignore and readme
 
 ---
 
-# Я Никита, и я отвечаю за архитектуру, фронтенд и делаю так, чтобы всё хотя бы как-то выглядело
+## Я <span style="color:red;font-weight:700;font-size:22px"> Никита </span> , и я отвечаю за архитектуру, фронтенд и делаю так, чтобы всё хотя бы как-то выглядело
 
 ## Занятие 1  
 
